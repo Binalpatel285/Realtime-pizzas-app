@@ -4,6 +4,18 @@ const ejs = require('ejs')
 const path = require('path')
 const expressLayout = require('express-ejs-layouts')
 const PORT = process.env.PORT || 3000
+const mongoose = require('mongoose')
+
+//Database connection
+const url = 'mongodb://localhost/pizza';
+mongoose.connect(url, {useNewUrlParser: true, useCreatIndex:true, useUnifiedTopology: true, useFindAndModify: true});
+const connection = mongoose.connection;
+connection.once('open', () => {
+   console.log('Database connected...');
+}) .catch(err => {
+   console.log('connection failed...')
+});
+
 
 //Assets
 app.use(express.static('public'))
@@ -13,17 +25,7 @@ app.use(expressLayout)
 app.set('views', path.join(__dirname, '/resources/views'))
 app.set('view engine', 'ejs')
 
-app.get('/', (req,res) => {
-    res.render('home')
-})
-
-app.get('/login',(req, res) => {
-       res.render('auth/login')
-})
-
-app.get('/register', (req,res) => {
-   res.render('auth/register')
-})
+require('./routes/web')(app)
 
 app.listen(PORT, () => {
    console.log('Listeing on port 3000')
